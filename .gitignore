@@ -4,6 +4,14 @@ node_modules/
 # Database
 database/dalil.db
 database/dalil_backup.db
+database/dalil_simulation.db
+database/*.db-wal
+database/*.db-shm
+
+# Python
+.venv/
+__pycache__/
+*.pyc
 
 # OS files
 .DS_Store
