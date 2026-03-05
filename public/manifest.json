@@ -1,0 +1,70 @@
+{
+  "name": "دليل المستودعات والأسواق المنزلية - الرقة",
+  "short_name": "دليل الرقة",
+  "description": "كل ما يحتاجه منزلك في مكان واحد - أثاث، أجهزة كهربائية، أدوات منزلية بأفضل الأسعار في مدينة الرقة",
+  "start_url": "/#/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f5f6fa",
+  "theme_color": "#1a5276",
+  "dir": "rtl",
+  "lang": "ar",
+  "scope": "/",
+  "icons": [
+    {
+      "src": "/icons/icon-72.png",
+      "sizes": "72x72",
+      "type": "image/png"
+    },
+    {
+      "src": "/icons/icon-96.png",
+      "sizes": "96x96",
+      "type": "image/png"
+    },
+    {
+      "src": "/icons/icon-128.png",
+      "sizes": "128x128",
+      "type": "image/png"
+    },
+    {
+      "src": "/icons/icon-144.png",
+      "sizes": "144x144",
+      "type": "image/png"
+    },
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [],
+  "categories": ["shopping", "business"],
+  "prefer_related_applications": false,
+  "shortcuts": [
+    {
+      "name": "التصنيفات",
+      "short_name": "تصنيفات",
+      "url": "/#/categories",
+      "icons": [{ "src": "/icons/icon-96.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "المتاجر",
+      "short_name": "متاجر",
+      "url": "/#/stores",
+      "icons": [{ "src": "/icons/icon-96.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "قائمة الأمنيات",
+      "short_name": "أمنياتي",
+      "url": "/#/wishlist",
+      "icons": [{ "src": "/icons/icon-96.png", "sizes": "96x96" }]
+    }
+  ]
+}

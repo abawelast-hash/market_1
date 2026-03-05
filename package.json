@@ -1,0 +1,23 @@
+{
+  "name": "dalil-raqqa",
+  "version": "1.0.0",
+  "description": "دليل المستودعات والأسواق المنزلية - مدينة الرقة",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "seed": "node database/seed.js",
+    "setup": "npm install && node database/seed.js",
+    "docs:watch": "node docs-watcher.js"
+  },
+  "keywords": ["pwa", "raqqa", "syria", "marketplace", "home-furniture"],
+  "author": "Dalil Al-Mustawdaat",
+  "license": "MIT",
+  "dependencies": {
+    "sql.js": "^1.11.0",
+    "compression": "^1.7.4",
+    "cors": "^2.8.5",
+    "express": "^4.21.0",
+    "uuid": "^10.0.0"
+  }
+}

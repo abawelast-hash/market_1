@@ -1,0 +1,30 @@
+# Dependencies
+node_modules/
+
+# Database
+database/dalil.db
+database/dalil_backup.db
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs
+*.log
+npm-debug.log*
+
+# Uploads
+public/uploads/*
+!public/uploads/.gitkeep
+
+# Environment
+.env
+.env.local
+.env.production

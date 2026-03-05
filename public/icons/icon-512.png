@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="80" fill="#1a5276"/>
+  <text x="256" y="200" text-anchor="middle" font-size="160">🏪</text>
+  <text x="256" y="340" text-anchor="middle" font-family="Arial" font-size="72" font-weight="bold" fill="white">دليل</text>
+  <text x="256" y="420" text-anchor="middle" font-family="Arial" font-size="48" fill="#e67e22">الرقة</text>
+</svg>

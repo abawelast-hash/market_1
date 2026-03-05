@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+  <meta name="theme-color" content="#1a5276">
+  <meta name="description" content="دليل المستودعات والأسواق المنزلية في مدينة الرقة - أثاث، أجهزة كهربائية، أدوات منزلية بأفضل الأسعار">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="دليل الرقة">
+  
+  <title>دليل المستودعات - الرقة</title>
+  
+  <link rel="manifest" href="/manifest.json">
+  <link rel="icon" type="image/svg+xml" href="/icons/favicon.svg">
+  <link rel="apple-touch-icon" href="/icons/icon-192.png">
+  
+  <!-- Preconnect for performance -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <!-- App Shell -->
+  <div id="app">
+    <!-- Header -->
+    <header class="app-header" id="appHeader">
+      <div class="header-content">
+        <button class="menu-btn" id="menuBtn" aria-label="القائمة">
+          <span></span><span></span><span></span>
+        </button>
+        <div class="header-logo">
+          <h1>🏪 دليل الرقة</h1>
+          <span class="header-subtitle">مستودعات وأسواق منزلية</span>
+        </div>
+        <div class="header-actions">
+          <button class="icon-btn" id="searchToggle" aria-label="بحث">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          </button>
+          <button class="icon-btn wishlist-btn" id="wishlistBtn" aria-label="قائمة الأمنيات">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+            <span class="badge" id="wishlistBadge" style="display:none">0</span>
+          </button>
+        </div>
+      </div>
+      
+      <!-- Search Bar (hidden by default) -->
+      <div class="search-bar" id="searchBar">
+        <div class="search-input-wrap">
+          <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          <input type="search" id="searchInput" placeholder="ابحث عن أثاث، أجهزة، أدوات منزلية..." autocomplete="off">
+          <button class="search-close" id="searchClose" aria-label="إغلاق">✕</button>
+        </div>
+        <div class="search-suggestions" id="searchSuggestions"></div>
+      </div>
+    </header>
+
+    <!-- Side Menu -->
+    <div class="side-menu-overlay" id="menuOverlay"></div>
+    <nav class="side-menu" id="sideMenu">
+      <div class="menu-header">
+        <div class="menu-logo">🏪</div>
+        <h2>دليل المستودعات</h2>
+        <p>مدينة الرقة</p>
+      </div>
+      <ul class="menu-list" id="menuList">
+        <li><a href="#/" data-page="home" class="active"><span class="menu-icon">🏠</span> الرئيسية</a></li>
+        <li><a href="#/categories" data-page="categories"><span class="menu-icon">📂</span> التصنيفات</a></li>
+        <li><a href="#/stores" data-page="stores"><span class="menu-icon">🏪</span> المتاجر</a></li>
+        <li><a href="#/offers" data-page="offers"><span class="menu-icon">🏷️</span> العروض والتخفيضات</a></li>
+        <li><a href="#/wishlist" data-page="wishlist"><span class="menu-icon">❤️</span> قائمة الأمنيات</a></li>
+        <li class="menu-divider"></li>
+        <li><a href="#/about" data-page="about"><span class="menu-icon">ℹ️</span> عن التطبيق</a></li>
+      </ul>
+      <div class="menu-footer">
+        <p>الإصدار 1.0.0</p>
+        <p>© 2025 دليل الرقة</p>
+      </div>
+    </nav>
+
+    <!-- Main Content Area -->
+    <main class="app-content" id="appContent">
+      <!-- Dynamic content loaded here -->
+      <div class="loading-screen" id="loadingScreen">
+        <div class="loader"></div>
+        <p>جارٍ التحميل...</p>
+      </div>
+    </main>
+
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav" id="bottomNav">
+      <a href="#/" class="nav-item active" data-page="home">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>
+        <span>الرئيسية</span>
+      </a>
+      <a href="#/categories" class="nav-item" data-page="categories">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        <span>التصنيفات</span>
+      </a>
+      <a href="#/stores" class="nav-item" data-page="stores">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7"/><path d="M3 9v11a1 1 0 001 1h16a1 1 0 001-1V9"/><path d="M9 21V12h6v9"/></svg>
+        <span>المتاجر</span>
+      </a>
+      <a href="#/wishlist" class="nav-item" data-page="wishlist">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        <span>أمنياتي</span>
+      </a>
+    </nav>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast"></div>
+
+    <!-- Install PWA Banner -->
+    <div class="install-banner" id="installBanner" style="display:none">
+      <div class="install-content">
+        <span class="install-icon">📱</span>
+        <div class="install-text">
+          <strong>ثبّت التطبيق على هاتفك</strong>
+          <small>للوصول السريع والعمل بدون إنترنت</small>
+        </div>
+        <button class="btn btn-primary btn-sm" id="installBtn">تثبيت</button>
+        <button class="install-close" id="installClose">✕</button>
+      </div>
+    </div>
+
+    <!-- Offline Banner -->
+    <div class="offline-banner" id="offlineBanner" style="display:none">
+      <span>📡</span> أنت تتصفح بدون إنترنت - البيانات المخزنة مسبقاً
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="/js/db.js"></script>
+  <script src="/js/api.js"></script>
+  <script src="/js/router.js"></script>
+  <script src="/js/ui.js"></script>
+  <script src="/js/wishlist.js"></script>
+  <script src="/js/share.js"></script>
+  <script src="/js/qr.js"></script>
+  <script src="/js/pages.js"></script>
+  <script src="/js/app.js"></script>
+</body>
+</html>
