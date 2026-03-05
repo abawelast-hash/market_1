@@ -5,6 +5,7 @@ node_modules/
 database/dalil.db
 database/dalil_backup.db
 database/dalil_simulation.db
+database/souq_v2.db
 database/*.db-wal
 database/*.db-shm
 
