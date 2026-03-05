@@ -4,7 +4,7 @@
  */
 const DalilDB = {
   DB_NAME: 'dalil-raqqa-db',
-  DB_VERSION: 2, // Bumped for new stores
+  DB_VERSION: 3, // V3: added packs store
   db: null,
 
   async init() {
@@ -60,6 +60,17 @@ const DalilDB = {
         // Loyalty cache
         if (!db.objectStoreNames.contains('loyalty')) {
           db.createObjectStore('loyalty', { keyPath: 'device_id' });
+        }
+
+        // Packs & Radar cache
+        if (!db.objectStoreNames.contains('packs')) {
+          const packsOS = db.createObjectStore('packs', { keyPath: 'id' });
+          packsOS.createIndex('downloaded_at', 'downloaded_at');
+        }
+
+        // Radar/geo cache
+        if (!db.objectStoreNames.contains('radar')) {
+          db.createObjectStore('radar', { keyPath: 'key' });
         }
       };
 

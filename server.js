@@ -45,6 +45,7 @@ app.use('/api/qr', require('./routes/qr'));
 app.use('/api/search', require('./routes/search'));
 app.use('/api/stats', require('./routes/stats'));
 app.use('/api/loyalty', require('./routes/loyalty'));
+app.use('/api/packs', require('./routes/packs'));
 
 // SPA fallback - serve index.html for all non-API routes
 app.get('*', (req, res) => {

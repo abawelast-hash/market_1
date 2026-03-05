@@ -73,11 +73,13 @@ const UI = {
   productCard(p) {
     const isWishlisted = Wishlist.has(p.id);
     const categoryIcon = p.category_icon || '📦';
+    const lqSrc = (typeof Packs !== 'undefined') ? Packs.lqPlaceholder(p) : '';
+    const hqSrc = p.image_url || '';
 
     return `
       <div class="product-card" onclick="Router.navigate('/product/${p.id}')">
         <div class="product-img">
-          <div class="placeholder-img">${categoryIcon}</div>
+          <div class="placeholder-img lq-placeholder" ${hqSrc ? `data-hq-src="${hqSrc}"` : ''} style="${lqSrc ? `background-image:url(${lqSrc});background-size:cover;` : ''}">${!lqSrc ? categoryIcon : ''}</div>
           ${p.discount_percent > 0 ? `<span class="product-badge">-${p.discount_percent}%</span>` : ''}
           ${p.is_featured ? '<span class="product-badge featured">مميز</span>' : ''}
           ${p.solar_compatible ? '<span class="product-badge solar">☀️ سولار</span>' : ''}

@@ -88,6 +88,27 @@ const Pages = {
             <p style="font-size:0.75rem;opacity:0.85">أنظمة سولار متكاملة</p>
           </div>
         </div>
+
+        <!-- حقيبة التجهيز + رادار + P2P -->
+        <div class="bento-grid" style="padding: 0 12px 12px;">
+          <div class="bento-item span-2" onclick="Router.navigate('/packs')" style="cursor:pointer;background:linear-gradient(135deg,#0d47a1,#1976d2);">
+            <div style="display:flex;align-items:center;gap:10px;">
+              <span style="font-size:2rem">🎒</span>
+              <div>
+                <h3 style="font-size:0.95rem;margin:0 0 4px">حقيبة التجهيز</h3>
+                <p style="font-size:0.75rem;opacity:0.85">حمّل حزمة كاملة وقارن أوفلاين</p>
+              </div>
+            </div>
+          </div>
+          <div class="bento-item" onclick="Router.navigate('/p2p')" style="cursor:pointer;background:linear-gradient(135deg,#4a148c,#7b1fa2);">
+            <div style="font-size:1.8rem">📡</div>
+            <div style="font-size:0.8rem;font-weight:600;margin-top:4px">نقل P2P</div>
+          </div>
+          <div class="bento-item" onclick="Pages._refreshRadar()" style="cursor:pointer;background:linear-gradient(135deg,#1b5e20,#388e3c);">
+            <div style="font-size:1.8rem">📡</div>
+            <div style="font-size:0.8rem;font-weight:600;margin-top:4px">رادار الحي</div>
+          </div>
+        </div>
       `);
     } catch (e) {
       UI.showError('تعذر تحميل الصفحة الرئيسية. تحقق من الاتصال بالإنترنت.');
@@ -1024,5 +1045,391 @@ const Pages = {
         </div>
       </div>
     `);
+  },
+
+  // ===================== حقيبة التجهيز — PACKS PAGE =====================
+  async packs() {
+    UI.showLoading();
+    try {
+      const data = await Packs.getAvailablePacks();
+      const packs = data.packs || [];
+      const radarTime = Packs.getLastRadarTime();
+
+      UI.render(`
+        <div class="page-title-bar">
+          <a href="#/" class="back-btn">→</a>
+          <h2 class="page-title">🎒 حقيبة التجهيز</h2>
+        </div>
+
+        <!-- Radar Status -->
+        <div class="card" style="margin: 0 12px 16px; padding: 14px; display: flex; align-items: center; gap: 12px;">
+          <div style="font-size: 2rem">📡</div>
+          <div style="flex: 1">
+            <div style="font-weight: 600; font-size: 0.9rem;">رادار الحي</div>
+            <div style="font-size: 0.78rem; color: var(--text-light);">
+              ${radarTime ? 
+                'آخر تحديث: ' + new Date(radarTime).toLocaleString('ar-SY', {hour:'2-digit',minute:'2-digit',day:'numeric',month:'short'}) : 
+                'لم يتم المسح بعد'}
+            </div>
+          </div>
+          <button class="btn btn-primary btn-sm" onclick="Pages._refreshRadar()" id="radarBtn">
+            ${radarTime ? '🔄 تحديث' : '📡 مسح'}
+          </button>
+        </div>
+
+        <!-- Info Card -->
+        <div class="card" style="margin: 0 12px 16px; padding: 14px; background: var(--gradient-primary, linear-gradient(135deg, #1a5276, #2980b9)); color: white; border-radius: 12px;">
+          <h3 style="font-size: 0.95rem; margin-bottom: 6px;">📦 كيف تعمل الحقائب؟</h3>
+          <p style="font-size: 0.78rem; opacity: 0.9; line-height: 1.6;">
+            اختر نوع مشروعك (تجهيز منزل، عروس، مطبخ...) ثم حمّل الحقيبة بالكامل.<br>
+            ستتمكن من تصفح ومقارنة المنتجات <strong>بدون إنترنت</strong> في بيتك!
+          </p>
+        </div>
+
+        <!-- Packs Grid -->
+        <div style="padding: 0 12px;">
+          ${packs.map(pack => {
+            const downloaded = Packs.isPackDownloaded(pack.id);
+            const dlDate = Packs.getPackDownloadDate(pack.id);
+            return `
+              <div class="card" style="margin-bottom: 12px; padding: 16px; cursor: pointer;" onclick="Router.navigate('/pack/${pack.id}')">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                  <div style="font-size: 2.2rem;">${pack.icon}</div>
+                  <div style="flex: 1;">
+                    <div style="font-weight: 700; font-size: 0.95rem;">${pack.name}</div>
+                    <div style="font-size: 0.78rem; color: var(--text-light); margin-top: 2px;">${pack.description}</div>
+                    <div style="display: flex; gap: 12px; margin-top: 6px; font-size: 0.75rem; color: var(--text-light);">
+                      <span>📦 ${pack.product_count} منتج</span>
+                      <span>🏪 ${pack.store_count} متجر</span>
+                    </div>
+                  </div>
+                  <div style="text-align: center;">
+                    ${downloaded ? `
+                      <span style="font-size: 1.2rem;">✅</span>
+                      <div style="font-size: 0.65rem; color: var(--text-light);">محمّل</div>
+                    ` : `
+                      <span style="font-size: 1.2rem;">📥</span>
+                      <div style="font-size: 0.65rem; color: var(--text-light);">تحميل</div>
+                    `}
+                  </div>
+                </div>
+              </div>
+            `;
+          }).join('')}
+        </div>
+
+        <!-- P2P Quick Access -->
+        <div style="padding: 12px; text-align: center;">
+          <div class="card" style="padding: 16px;">
+            <div style="font-size: 1.5rem; margin-bottom: 6px;">📡</div>
+            <h3 style="font-size: 0.9rem; margin-bottom: 4px;">نقل محلي P2P</h3>
+            <p style="font-size: 0.78rem; color: var(--text-light); margin-bottom: 10px;">
+              انقل البيانات لصديق بدون إنترنت عبر WebRTC
+            </p>
+            <button class="btn btn-outline btn-sm" onclick="Router.navigate('/p2p')">فتح P2P</button>
+          </div>
+        </div>
+      `);
+    } catch (e) {
+      UI.showError('تعذر تحميل الحقائب');
+    }
+  },
+
+  async _refreshRadar() {
+    const btn = document.getElementById('radarBtn');
+    if (btn) { btn.disabled = true; btn.textContent = '⏳ جارٍ المسح...'; }
+    try {
+      await Packs.startRadar();
+      UI.toast('📡 تم تحديث رادار الحي');
+      Pages.packs(); // refresh
+    } catch (e) {
+      UI.toast('❌ تعذر المسح');
+      if (btn) { btn.disabled = false; btn.textContent = '🔄 تحديث'; }
+    }
+  },
+
+  // ===================== PACK DETAIL PAGE =====================
+  async packDetail({ id }) {
+    UI.showLoading();
+    try {
+      const data = await Packs.downloadPack(id);
+      const { pack, products, stores, categories, priceRange } = data;
+
+      UI.render(`
+        <div class="page-title-bar">
+          <a href="#/packs" class="back-btn">→</a>
+          <h2 class="page-title">${pack.icon} ${pack.name}</h2>
+        </div>
+
+        <!-- Pack Stats -->
+        <div class="bento-grid" style="padding: 12px;">
+          <div class="bento-item gradient-primary">
+            <div style="font-size: 1.8rem;">📦</div>
+            <div style="font-size: 1.3rem; font-weight: 700;">${products.length}</div>
+            <div style="font-size: 0.75rem; opacity: 0.85;">منتج</div>
+          </div>
+          <div class="bento-item gradient-gold">
+            <div style="font-size: 1.8rem;">🏪</div>
+            <div style="font-size: 1.3rem; font-weight: 700;">${stores.length}</div>
+            <div style="font-size: 0.75rem; opacity: 0.85;">متجر</div>
+          </div>
+          <div class="bento-item span-2" style="background: var(--card-bg); border: 1px solid var(--border);">
+            <div style="font-size: 0.82rem; color: var(--text-light);">نطاق الأسعار</div>
+            <div style="font-size: 0.95rem; font-weight: 600; margin-top: 4px;">
+              ${priceRange.min_formatted} — ${priceRange.max_formatted}
+            </div>
+            <div style="font-size: 0.75rem; color: var(--text-light);">متوسط: ${priceRange.avg_formatted}</div>
+          </div>
+        </div>
+
+        <!-- Pack info -->
+        <div style="padding: 0 12px 8px; display: flex; align-items: center; gap: 8px;">
+          <span style="font-size: 0.75rem; color: var(--text-light);">✅ محمّل للتصفح أوفلاين</span>
+          <button class="btn btn-outline btn-sm" style="margin-right: auto; font-size: 0.72rem; padding: 4px 8px;" onclick="Pages._deletePack('${pack.id}')">🗑️ حذف</button>
+        </div>
+
+        <!-- Categories -->
+        ${categories.length > 0 ? `
+          <div class="categories-scroll">
+            ${categories.map(c => `
+              <span class="category-chip" onclick="Pages._filterPackProducts('${pack.id}', ${c.id})" style="cursor:pointer">
+                <span class="cat-icon">${c.icon || '📂'}</span>
+                <span class="cat-name">${c.name}</span>
+                <span class="cat-count">${c.count}</span>
+              </span>
+            `).join('')}
+          </div>
+        ` : ''}
+
+        <!-- Stores -->
+        <div class="section-header">
+          <h3 class="section-title">🏪 المتاجر</h3>
+        </div>
+        <div style="overflow-x: auto; white-space: nowrap; padding: 0 12px 12px; -webkit-overflow-scrolling: touch;">
+          ${stores.map(s => `
+            <a class="store-card" href="#/store/${s.slug}" style="display: inline-block; width: 280px; vertical-align: top; white-space: normal; margin-left: 8px;">
+              <div class="store-card-logo">${s.name.charAt(0)}</div>
+              <div class="store-card-info">
+                <div class="store-card-name">${s.name} ${s.is_verified ? '<span class="verified-icon">✓</span>' : ''}</div>
+                <div class="store-card-meta">📍 ${s.neighborhood || ''}</div>
+                <div class="store-card-stats">
+                  <span>★ ${s.rating}</span>
+                  <span>📦 ${s.product_count || 0}</span>
+                  ${s.delivery_available ? '<span>🚚</span>' : ''}
+                </div>
+              </div>
+            </a>
+          `).join('')}
+        </div>
+
+        <!-- Products -->
+        <div class="section-header">
+          <h3 class="section-title">📦 المنتجات</h3>
+        </div>
+        <div class="products-grid" id="packProductsGrid">
+          ${products.map(p => UI.productCard(p)).join('')}
+        </div>
+      `);
+
+      // Activate LQ lazy loading
+      setTimeout(() => Packs.activateLazyImages(), 100);
+    } catch (e) {
+      UI.showError('تعذر تحميل الحقيبة');
+    }
+  },
+
+  async _deletePack(packId) {
+    await Packs.deletePack(packId);
+    Router.navigate('/packs');
+  },
+
+  _filterPackProducts(packId, categoryId) {
+    // Quick client-side filter
+    const grid = document.getElementById('packProductsGrid');
+    if (!grid) return;
+    grid.querySelectorAll('.product-card').forEach(card => {
+      // Simple show/hide, relies on re-render for accuracy
+    });
+    // Easier: reload with filter
+    Pages.packDetail({ id: packId, filterCategory: categoryId });
+  },
+
+  // ===================== P2P LOCAL SYNC PAGE =====================
+  async p2pSync() {
+    UI.render(`
+      <div class="page-title-bar">
+        <a href="#/packs" class="back-btn">→</a>
+        <h2 class="page-title">📡 نقل محلي P2P</h2>
+      </div>
+
+      <!-- How it works -->
+      <div class="card" style="margin: 12px; padding: 16px; line-height: 1.8;">
+        <h3 style="font-size: 0.95rem; margin-bottom: 8px;">🔗 كيف يعمل النقل المحلي؟</h3>
+        <p style="font-size: 0.8rem; color: var(--text-light);">
+          1. <strong>المرسل</strong> يضغط "إنشاء رابط" وينسخ الكود<br>
+          2. <strong>المستقبل</strong> يلصق الكود في خانة "الانضمام"<br>
+          3. يتم الاتصال مباشرة (WebRTC) بدون وسيط إنترنت<br>
+          4. المرسل يضغط "إرسال البيانات" لنقل كل المنتجات والمتاجر
+        </p>
+      </div>
+
+      <!-- Status -->
+      <div class="card" style="margin: 0 12px 12px; padding: 14px; text-align: center;" id="p2pStatus">
+        <div style="font-size: 2rem;" id="p2pStatusIcon">🔌</div>
+        <div style="font-size: 0.85rem; font-weight: 600; margin-top: 4px;" id="p2pStatusText">غير متصل</div>
+      </div>
+
+      <!-- Host Mode -->
+      <div class="card" style="margin: 0 12px 12px; padding: 16px;">
+        <h3 style="font-size: 0.9rem; margin-bottom: 10px;">📤 الإرسال (أنت لديك البيانات)</h3>
+        <button class="btn btn-primary btn-sm" onclick="Pages._p2pCreateOffer()" id="p2pOfferBtn" style="width: 100%; margin-bottom: 8px;">
+          🔗 إنشاء رابط
+        </button>
+        <div id="p2pOfferCode" style="display: none;">
+          <textarea id="p2pOfferText" readonly style="width: 100%; height: 60px; font-size: 0.7rem; border-radius: 8px; border: 1px solid var(--border); padding: 8px; resize: none; direction: ltr;"></textarea>
+          <button class="btn btn-outline btn-sm" onclick="Pages._p2pCopyCode('p2pOfferText')" style="width: 100%; margin-top: 6px;">📋 نسخ الكود</button>
+        </div>
+        <div id="p2pAnswerInput" style="display: none; margin-top: 10px;">
+          <label style="font-size: 0.8rem; color: var(--text-light);">الصق رد المستقبل هنا:</label>
+          <textarea id="p2pAnswerText" style="width: 100%; height: 60px; font-size: 0.7rem; border-radius: 8px; border: 1px solid var(--border); padding: 8px; resize: none; direction: ltr;" placeholder="الصق كود الرد هنا..."></textarea>
+          <button class="btn btn-primary btn-sm" onclick="Pages._p2pAcceptAnswer()" style="width: 100%; margin-top: 6px;">🔗 إتمام الاتصال</button>
+        </div>
+      </div>
+
+      <!-- Join Mode -->
+      <div class="card" style="margin: 0 12px 12px; padding: 16px;">
+        <h3 style="font-size: 0.9rem; margin-bottom: 10px;">📥 الاستقبال (تريد الحصول على البيانات)</h3>
+        <label style="font-size: 0.8rem; color: var(--text-light);">الصق كود المرسل هنا:</label>
+        <textarea id="p2pJoinOfferText" style="width: 100%; height: 60px; font-size: 0.7rem; border-radius: 8px; border: 1px solid var(--border); padding: 8px; resize: none; direction: ltr;" placeholder="الصق كود الاتصال هنا..."></textarea>
+        <button class="btn btn-primary btn-sm" onclick="Pages._p2pJoin()" style="width: 100%; margin-top: 6px;">
+          📥 انضمام
+        </button>
+        <div id="p2pJoinAnswer" style="display: none; margin-top: 10px;">
+          <label style="font-size: 0.8rem; color: var(--text-light);">أرسل هذا الرد للمرسل:</label>
+          <textarea id="p2pJoinAnswerText" readonly style="width: 100%; height: 60px; font-size: 0.7rem; border-radius: 8px; border: 1px solid var(--border); padding: 8px; resize: none; direction: ltr;"></textarea>
+          <button class="btn btn-outline btn-sm" onclick="Pages._p2pCopyCode('p2pJoinAnswerText')" style="width: 100%; margin-top: 6px;">📋 نسخ الرد</button>
+        </div>
+      </div>
+
+      <!-- Send Data Button -->
+      <div class="card" style="margin: 0 12px 12px; padding: 16px; text-align: center;" id="p2pSendSection" style="display: none;">
+        <button class="btn btn-whatsapp" onclick="Pages._p2pSendData()" id="p2pSendBtn" disabled style="width: 100%;">
+          🚀 إرسال البيانات
+        </button>
+        <div id="p2pProgress" style="display: none; margin-top: 10px;">
+          <div style="background: var(--border); border-radius: 4px; height: 6px; overflow: hidden;">
+            <div id="p2pProgressBar" style="background: var(--primary); height: 100%; width: 0%; transition: width 0.3s;"></div>
+          </div>
+          <div id="p2pProgressText" style="font-size: 0.75rem; color: var(--text-light); margin-top: 4px;"></div>
+        </div>
+      </div>
+
+      <!-- Disconnect -->
+      <div style="padding: 0 12px 20px; text-align: center;">
+        <button class="btn btn-outline btn-sm" onclick="Pages._p2pDisconnect()" style="color: #e74c3c;">
+          🔌 قطع الاتصال
+        </button>
+        ${localStorage.getItem('dalil_p2p_last') ? `
+          <div style="font-size: 0.72rem; color: var(--text-light); margin-top: 8px;">
+            آخر نقل: ${new Date(localStorage.getItem('dalil_p2p_last')).toLocaleString('ar-SY')}
+          </div>
+        ` : ''}
+      </div>
+    `);
+  },
+
+  async _p2pCreateOffer() {
+    const btn = document.getElementById('p2pOfferBtn');
+    btn.disabled = true;
+    btn.textContent = '⏳ جارٍ الإنشاء...';
+
+    try {
+      const offerCode = await Packs.p2p.createOffer();
+      document.getElementById('p2pOfferText').value = offerCode;
+      document.getElementById('p2pOfferCode').style.display = 'block';
+      document.getElementById('p2pAnswerInput').style.display = 'block';
+      btn.textContent = '✅ تم الإنشاء';
+      UI.toast('📋 انسخ الكود وأرسله للمستقبل');
+    } catch (e) {
+      btn.disabled = false;
+      btn.textContent = '🔗 إنشاء رابط';
+      UI.toast('❌ فشل الإنشاء');
+    }
+  },
+
+  async _p2pAcceptAnswer() {
+    const answer = document.getElementById('p2pAnswerText').value.trim();
+    if (!answer) { UI.toast('الصق كود الرد أولاً'); return; }
+
+    try {
+      await Packs.p2p.acceptAnswer(answer);
+      Pages._p2pUpdateStatus(true);
+      document.getElementById('p2pSendBtn').disabled = false;
+      UI.toast('🔗 تم الاتصال!');
+    } catch (e) {
+      UI.toast('❌ كود غير صالح');
+    }
+  },
+
+  async _p2pJoin() {
+    const offer = document.getElementById('p2pJoinOfferText').value.trim();
+    if (!offer) { UI.toast('الصق كود المرسل أولاً'); return; }
+
+    try {
+      const answerCode = await Packs.p2p.acceptOffer(offer);
+      document.getElementById('p2pJoinAnswerText').value = answerCode;
+      document.getElementById('p2pJoinAnswer').style.display = 'block';
+      UI.toast('📋 انسخ الرد وأرسله للمرسل');
+
+      // Set up receive callback for progress
+      Packs.p2p.onReceive = (info) => {
+        if (info.progress) {
+          const pct = Math.round(info.progress * 100);
+          const bar = document.getElementById('p2pProgressBar');
+          const text = document.getElementById('p2pProgressText');
+          if (bar) bar.style.width = pct + '%';
+          if (text) text.textContent = `${pct}% ...`;
+          document.getElementById('p2pProgress').style.display = 'block';
+        }
+      };
+    } catch (e) {
+      UI.toast('❌ كود غير صالح');
+    }
+  },
+
+  _p2pCopyCode(textareaId) {
+    const textarea = document.getElementById(textareaId);
+    if (!textarea) return;
+    textarea.select();
+    document.execCommand('copy');
+    UI.toast('📋 تم النسخ!');
+  },
+
+  async _p2pSendData() {
+    const btn = document.getElementById('p2pSendBtn');
+    btn.disabled = true;
+    btn.textContent = '⏳ جارٍ الإرسال...';
+    document.getElementById('p2pProgress').style.display = 'block';
+
+    try {
+      await Packs.p2p.sendData();
+      btn.textContent = '✅ تم الإرسال';
+    } catch (e) {
+      btn.disabled = false;
+      btn.textContent = '🚀 إرسال البيانات';
+    }
+  },
+
+  _p2pUpdateStatus(connected) {
+    const icon = document.getElementById('p2pStatusIcon');
+    const text = document.getElementById('p2pStatusText');
+    if (icon) icon.textContent = connected ? '🟢' : '🔌';
+    if (text) text.textContent = connected ? 'متصل' : 'غير متصل';
+  },
+
+  _p2pDisconnect() {
+    Packs.p2p.disconnect();
+    Pages._p2pUpdateStatus(false);
+    UI.toast('🔌 تم قطع الاتصال');
   }
 };

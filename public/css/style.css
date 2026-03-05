@@ -756,6 +756,16 @@ input, select {
   justify-content: center;
   font-size: 3rem;
   background: linear-gradient(135deg, #f5f6fa, #ecf0f1);
+  background-size: cover;
+  background-position: center;
+  transition: filter 0.4s ease, background-image 0.4s ease;
+}
+
+/* LQ-Placeholder: loaded state (high quality photo faded in) */
+.product-img .placeholder-img.lq-loaded {
+  filter: none !important;
+  background-size: cover;
+  background-position: center;
 }
 
 .product-badge {
@@ -2287,4 +2297,36 @@ input, select {
   font-size: 0.7rem;
   font-weight: 700;
   z-index: 10;
+}
+
+/* ===================================
+   PACKS & P2P STYLES
+   =================================== */
+.pack-card {
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  padding: 16px;
+  margin-bottom: 12px;
+  box-shadow: var(--shadow);
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+.pack-card:active {
+  transform: scale(0.98);
+}
+
+/* P2P status indicator */
+.p2p-status-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+  margin-left: 6px;
+}
+.p2p-status-dot.connected { background: #27ae60; animation: pulse-dot 1.5s infinite; }
+.p2p-status-dot.disconnected { background: #e74c3c; }
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
 }

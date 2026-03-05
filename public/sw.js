@@ -3,10 +3,10 @@
  * Offline-first strategy with Background Sync for Syrian internet conditions
  */
 
-const CACHE_NAME = 'dalil-raqqa-v2';
-const STATIC_CACHE = 'dalil-static-v2';
-const API_CACHE = 'dalil-api-v2';
-const IMAGE_CACHE = 'dalil-images-v2';
+const CACHE_NAME = 'dalil-raqqa-v3';
+const STATIC_CACHE = 'dalil-static-v3';
+const API_CACHE = 'dalil-api-v3';
+const IMAGE_CACHE = 'dalil-images-v3';
 
 // Static assets to cache on install
 const STATIC_ASSETS = [
@@ -21,6 +21,7 @@ const STATIC_ASSETS = [
   '/js/share.js',
   '/js/qr.js',
   '/js/loyalty.js',
+  '/js/packs.js',
   '/js/pages.js',
   '/js/app.js',
   '/manifest.json',
@@ -31,7 +32,7 @@ const STATIC_ASSETS = [
 
 // Install: cache static assets
 self.addEventListener('install', (event) => {
-  console.log('[SW] Installing v2...');
+  console.log('[SW] Installing v3...');
   event.waitUntil(
     caches.open(STATIC_CACHE)
       .then(cache => cache.addAll(STATIC_ASSETS))
@@ -41,7 +42,7 @@ self.addEventListener('install', (event) => {
 
 // Activate: cleanup old caches
 self.addEventListener('activate', (event) => {
-  console.log('[SW] Activating v2...');
+  console.log('[SW] Activating v3...');
   event.waitUntil(
     caches.keys().then(keys => {
       return Promise.all(
@@ -128,7 +129,7 @@ async function replaySyncQueue() {
 
 function openIDB() {
   return new Promise((resolve) => {
-    const request = indexedDB.open('dalil-raqqa-db', 2);
+    const request = indexedDB.open('dalil-raqqa-db', 3);
     request.onsuccess = (e) => resolve(e.target.result);
     request.onerror = () => resolve(null);
   });

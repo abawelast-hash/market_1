@@ -21,6 +21,9 @@ const App = {
     // Initialize Loyalty
     await Loyalty.init();
 
+    // Initialize Packs (Radar + LQ + P2P)
+    await Packs.init();
+
     // Setup device ID
     this.setupDeviceId();
 
@@ -79,6 +82,9 @@ const App = {
     Router.on('/wishlist', () => Pages.wishlist());
     Router.on('/search', (params) => Pages.searchResults(params));
     Router.on('/loyalty', () => Pages.loyalty());
+    Router.on('/packs', () => Pages.packs());
+    Router.on('/pack/:id', (params) => Pages.packDetail(params));
+    Router.on('/p2p', () => Pages.p2pSync());
     Router.on('/about', () => Pages.about());
   },
 
