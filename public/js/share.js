@@ -19,8 +19,9 @@ const Share = {
     const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(text)}`;
     window.open(whatsappUrl, '_blank');
 
-    // Record share
+    // Record share + loyalty reward
     API.shareProduct(product.id, App.getDeviceId(), 'whatsapp').catch(() => {});
+    if (typeof Loyalty !== 'undefined') Loyalty.rewardShare(product.id, 'whatsapp');
   },
 
   // Share store via WhatsApp

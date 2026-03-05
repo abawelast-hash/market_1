@@ -1,10 +1,10 @@
 /**
  * IndexedDB Wrapper - دليل الرقة
- * Offline-first data storage for Syrian internet conditions
+ * Offline-first data storage with Sync Engine for Syrian internet conditions
  */
 const DalilDB = {
   DB_NAME: 'dalil-raqqa-db',
-  DB_VERSION: 1,
+  DB_VERSION: 2, // Bumped for new stores
   db: null,
 
   async init() {
@@ -40,7 +40,14 @@ const DalilDB = {
           wishOS.createIndex('added_at', 'added_at');
         }
 
-        // Pending actions (for offline sync)
+        // Sync Queue - offline actions to replay when online
+        if (!db.objectStoreNames.contains('sync_queue')) {
+          const syncOS = db.createObjectStore('sync_queue', { keyPath: 'id', autoIncrement: true });
+          syncOS.createIndex('status', 'status');
+          syncOS.createIndex('created_at', 'created_at');
+        }
+
+        // Pending actions (legacy compat)
         if (!db.objectStoreNames.contains('pending_actions')) {
           db.createObjectStore('pending_actions', { keyPath: 'id', autoIncrement: true });
         }
@@ -48,6 +55,11 @@ const DalilDB = {
         // General cache
         if (!db.objectStoreNames.contains('cache')) {
           db.createObjectStore('cache', { keyPath: 'key' });
+        }
+
+        // Loyalty cache
+        if (!db.objectStoreNames.contains('loyalty')) {
+          db.createObjectStore('loyalty', { keyPath: 'device_id' });
         }
       };
 
@@ -136,5 +148,68 @@ const DalilDB = {
       return cached.data;
     }
     return null;
+  },
+
+  // === Sync Engine ===
+  async queueAction(action) {
+    await this.put('sync_queue', {
+      ...action,
+      status: 'pending',
+      created_at: Date.now(),
+      retries: 0
+    });
+    // Request background sync if available
+    if ('serviceWorker' in navigator && 'SyncManager' in window) {
+      const reg = await navigator.serviceWorker.ready;
+      try { await reg.sync.register('dalil-sync'); } catch (e) { /* ignore */ }
+    }
+  },
+
+  async getPendingActions() {
+    const all = await this.getAll('sync_queue');
+    return all.filter(a => a.status === 'pending');
+  },
+
+  async markSynced(id) {
+    const item = await this.get('sync_queue', id);
+    if (item) {
+      item.status = 'synced';
+      item.synced_at = Date.now();
+      await this.put('sync_queue', item);
+    }
+  },
+
+  async markFailed(id) {
+    const item = await this.get('sync_queue', id);
+    if (item) {
+      item.retries = (item.retries || 0) + 1;
+      if (item.retries >= 5) item.status = 'failed';
+      await this.put('sync_queue', item);
+    }
+  },
+
+  // Flush sync queue - replay pending actions
+  async flushSyncQueue() {
+    const pending = await this.getPendingActions();
+    if (pending.length === 0) return;
+    console.log(`🔄 مزامنة ${pending.length} إجراء معلق...`);
+
+    for (const action of pending) {
+      try {
+        const response = await fetch(action.url, {
+          method: action.method || 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: action.body ? JSON.stringify(action.body) : undefined
+        });
+        if (response.ok) {
+          await this.markSynced(action.id);
+          console.log(`✅ تمت مزامنة: ${action.description || action.url}`);
+        } else {
+          await this.markFailed(action.id);
+        }
+      } catch (e) {
+        await this.markFailed(action.id);
+      }
+    }
   }
 };

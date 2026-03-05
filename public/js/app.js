@@ -18,6 +18,9 @@ const App = {
     // Initialize Wishlist
     await Wishlist.init();
 
+    // Initialize Loyalty
+    await Loyalty.init();
+
     // Setup device ID
     this.setupDeviceId();
 
@@ -31,6 +34,12 @@ const App = {
     // Setup search
     this.setupSearch();
 
+    // Setup dark mode
+    this.setupDarkMode();
+
+    // Setup visual search
+    this.setupVisualSearch();
+
     // Setup PWA install
     this.setupPWAInstall();
 
@@ -39,6 +48,9 @@ const App = {
 
     // Register service worker
     this.registerServiceWorker();
+
+    // Setup sync listener
+    this.setupSyncListener();
 
     console.log('✅ التطبيق جاهز');
   },
@@ -66,6 +78,7 @@ const App = {
     Router.on('/offers', () => Pages.offers());
     Router.on('/wishlist', () => Pages.wishlist());
     Router.on('/search', (params) => Pages.searchResults(params));
+    Router.on('/loyalty', () => Pages.loyalty());
     Router.on('/about', () => Pages.about());
   },
 
@@ -159,6 +172,85 @@ const App = {
     });
   },
 
+  setupDarkMode() {
+    const toggle = document.getElementById('themeToggle');
+    if (!toggle) return;
+
+    // Restore saved preference
+    const saved = localStorage.getItem('dalil_theme');
+    if (saved === 'dark') {
+      document.documentElement.setAttribute('data-theme', 'dark');
+      toggle.textContent = '☀️';
+    } else if (!saved) {
+      // Follow system preference
+      if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        toggle.textContent = '☀️';
+      }
+    }
+
+    toggle.addEventListener('click', () => {
+      const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+      if (isDark) {
+        document.documentElement.removeAttribute('data-theme');
+        localStorage.setItem('dalil_theme', 'light');
+        toggle.textContent = '🌙';
+      } else {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        localStorage.setItem('dalil_theme', 'dark');
+        toggle.textContent = '☀️';
+      }
+      if (navigator.vibrate) navigator.vibrate(15);
+    });
+  },
+
+  setupVisualSearch() {
+    const btn = document.getElementById('visualSearchBtn');
+    if (!btn) return;
+
+    btn.addEventListener('click', () => {
+      // Create hidden file input for camera/gallery
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = 'image/*';
+      input.capture = 'environment';
+      input.style.display = 'none';
+      document.body.appendChild(input);
+
+      input.addEventListener('change', async () => {
+        if (!input.files || !input.files[0]) return;
+        const file = input.files[0];
+        UI.toast('🔍 جاري البحث المرئي...');
+
+        try {
+          const data = await API.visualSearch(file);
+          if (data.results && data.results.length > 0) {
+            Pages.visualSearchResults(data.results);
+          } else {
+            UI.toast('لم يتم العثور على نتائج مطابقة');
+          }
+        } catch (e) {
+          UI.toast('حدث خطأ في البحث المرئي');
+        }
+        document.body.removeChild(input);
+      });
+
+      input.click();
+    });
+  },
+
+  setupSyncListener() {
+    if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+      navigator.serviceWorker.addEventListener('message', (event) => {
+        if (event.data && event.data.type === 'sync-complete') {
+          UI.toast('🔄 تمت مزامنة البيانات');
+          // Refresh loyalty data
+          Loyalty.init();
+        }
+      });
+    }
+  },
+
   setupPWAInstall() {
     const banner = document.getElementById('installBanner');
     const installBtn = document.getElementById('installBtn');
@@ -208,6 +300,8 @@ const App = {
     window.addEventListener('online', () => {
       offlineBanner.style.display = 'none';
       UI.toast('🟢 تم استعادة الاتصال');
+      // Flush pending sync queue
+      DalilDB.flushSyncQueue().catch(() => {});
     });
 
     window.addEventListener('offline', () => {

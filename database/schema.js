@@ -167,6 +167,57 @@ function initSchema() {
     sort_order INTEGER DEFAULT 0
   )`);
 
+  // === Escrow Transactions (Task 3) ===
+  db.run(`CREATE TABLE IF NOT EXISTS escrow_transactions (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    tx_code TEXT UNIQUE NOT NULL,
+    product_id INTEGER NOT NULL,
+    store_id INTEGER NOT NULL,
+    buyer_device_id TEXT NOT NULL,
+    amount REAL NOT NULL,
+    status TEXT DEFAULT 'pending',
+    released_at DATETIME,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  )`);
+
+  // === Loyalty / Gamification (Task 4) ===
+  db.run(`CREATE TABLE IF NOT EXISTS loyalty_accounts (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    device_id TEXT UNIQUE NOT NULL,
+    coins INTEGER DEFAULT 0,
+    total_earned INTEGER DEFAULT 0,
+    level INTEGER DEFAULT 1,
+    streak INTEGER DEFAULT 0,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  )`);
+
+  db.run(`CREATE TABLE IF NOT EXISTS loyalty_transactions (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    device_id TEXT NOT NULL,
+    type TEXT NOT NULL,
+    coins INTEGER NOT NULL,
+    description TEXT,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  )`);
+
+  db.run(`CREATE TABLE IF NOT EXISTS daily_checkins (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    device_id TEXT NOT NULL,
+    date TEXT NOT NULL,
+    coins_earned INTEGER DEFAULT 1,
+    UNIQUE(device_id, date)
+  )`);
+
+  // === Sync Queue (Task 1) ===
+  db.run(`CREATE TABLE IF NOT EXISTS sync_queue (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    device_id TEXT NOT NULL,
+    action TEXT NOT NULL,
+    payload TEXT,
+    status TEXT DEFAULT 'pending',
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  )`);
+
   const indexes = [
     'CREATE INDEX IF NOT EXISTS idx_products_store ON products(store_id)',
     'CREATE INDEX IF NOT EXISTS idx_products_category ON products(category_id)',
@@ -176,6 +227,12 @@ function initSchema() {
     'CREATE INDEX IF NOT EXISTS idx_stores_featured ON stores(is_featured)',
     'CREATE INDEX IF NOT EXISTS idx_wishlists_device ON wishlists(device_id)',
     'CREATE INDEX IF NOT EXISTS idx_product_images_product ON product_images(product_id)',
+    'CREATE INDEX IF NOT EXISTS idx_escrow_tx_code ON escrow_transactions(tx_code)',
+    'CREATE INDEX IF NOT EXISTS idx_escrow_buyer ON escrow_transactions(buyer_device_id)',
+    'CREATE INDEX IF NOT EXISTS idx_loyalty_device ON loyalty_accounts(device_id)',
+    'CREATE INDEX IF NOT EXISTS idx_loyalty_tx_device ON loyalty_transactions(device_id)',
+    'CREATE INDEX IF NOT EXISTS idx_checkins_device ON daily_checkins(device_id)',
+    'CREATE INDEX IF NOT EXISTS idx_sync_queue_status ON sync_queue(status)',
   ];
   indexes.forEach(idx => { try { db.run(idx); } catch(e) {} });
 }

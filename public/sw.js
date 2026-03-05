@@ -1,12 +1,12 @@
 /**
  * Service Worker - دليل الرقة
- * Offline-first strategy for Syrian internet conditions
+ * Offline-first strategy with Background Sync for Syrian internet conditions
  */
 
-const CACHE_NAME = 'dalil-raqqa-v1';
-const STATIC_CACHE = 'dalil-static-v1';
-const API_CACHE = 'dalil-api-v1';
-const IMAGE_CACHE = 'dalil-images-v1';
+const CACHE_NAME = 'dalil-raqqa-v2';
+const STATIC_CACHE = 'dalil-static-v2';
+const API_CACHE = 'dalil-api-v2';
+const IMAGE_CACHE = 'dalil-images-v2';
 
 // Static assets to cache on install
 const STATIC_ASSETS = [
@@ -20,6 +20,7 @@ const STATIC_ASSETS = [
   '/js/wishlist.js',
   '/js/share.js',
   '/js/qr.js',
+  '/js/loyalty.js',
   '/js/pages.js',
   '/js/app.js',
   '/manifest.json',
@@ -30,7 +31,7 @@ const STATIC_ASSETS = [
 
 // Install: cache static assets
 self.addEventListener('install', (event) => {
-  console.log('[SW] Installing...');
+  console.log('[SW] Installing v2...');
   event.waitUntil(
     caches.open(STATIC_CACHE)
       .then(cache => cache.addAll(STATIC_ASSETS))
@@ -40,7 +41,7 @@ self.addEventListener('install', (event) => {
 
 // Activate: cleanup old caches
 self.addEventListener('activate', (event) => {
-  console.log('[SW] Activating...');
+  console.log('[SW] Activating v2...');
   event.waitUntil(
     caches.keys().then(keys => {
       return Promise.all(
@@ -57,12 +58,11 @@ self.addEventListener('fetch', (event) => {
   const { request } = event;
   const url = new URL(request.url);
 
-  // Skip non-GET requests
+  // Skip non-GET requests (let POST/PUT pass through)
   if (request.method !== 'GET') return;
 
   // Strategy based on request type
   if (url.pathname.startsWith('/api/')) {
-    // API requests: Network-first, fallback to cache
     event.respondWith(networkFirst(request, API_CACHE));
   } else if (
     request.destination === 'image' || 
@@ -70,20 +70,80 @@ self.addEventListener('fetch', (event) => {
     url.pathname.endsWith('.jpg') ||
     url.pathname.endsWith('.png')
   ) {
-    // Images: Cache-first (images don't change often)
     event.respondWith(cacheFirst(request, IMAGE_CACHE));
   } else if (url.pathname.startsWith('/icons/') || url.pathname.startsWith('/css/') || url.pathname.startsWith('/js/')) {
-    // Static assets: Cache-first
     event.respondWith(cacheFirst(request, STATIC_CACHE));
   } else {
-    // HTML/other: Network-first for fresh content
     event.respondWith(networkFirst(request, STATIC_CACHE));
   }
 });
 
 /**
+ * Background Sync - replay offline actions when connection restores
+ */
+self.addEventListener('sync', (event) => {
+  if (event.tag === 'dalil-sync') {
+    console.log('[SW] Background Sync triggered');
+    event.waitUntil(replaySyncQueue());
+  }
+});
+
+async function replaySyncQueue() {
+  // Open IndexedDB in service worker context
+  const db = await openIDB();
+  if (!db) return;
+
+  const tx = db.transaction('sync_queue', 'readwrite');
+  const store = tx.objectStore('sync_queue');
+  const allItems = await idbGetAll(store);
+
+  for (const item of allItems) {
+    if (item.status !== 'pending') continue;
+    try {
+      const response = await fetch(item.url, {
+        method: item.method || 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: item.body ? JSON.stringify(item.body) : undefined
+      });
+      if (response.ok) {
+        item.status = 'synced';
+        item.synced_at = Date.now();
+      } else {
+        item.retries = (item.retries || 0) + 1;
+        if (item.retries >= 5) item.status = 'failed';
+      }
+    } catch (e) {
+      item.retries = (item.retries || 0) + 1;
+      if (item.retries >= 5) item.status = 'failed';
+    }
+    const updateTx = db.transaction('sync_queue', 'readwrite');
+    updateTx.objectStore('sync_queue').put(item);
+  }
+  db.close();
+
+  // Notify clients that sync is done
+  const clients = await self.clients.matchAll();
+  clients.forEach(client => client.postMessage({ type: 'sync-complete' }));
+}
+
+function openIDB() {
+  return new Promise((resolve) => {
+    const request = indexedDB.open('dalil-raqqa-db', 2);
+    request.onsuccess = (e) => resolve(e.target.result);
+    request.onerror = () => resolve(null);
+  });
+}
+
+function idbGetAll(store) {
+  return new Promise((resolve) => {
+    const request = store.getAll();
+    request.onsuccess = () => resolve(request.result || []);
+    request.onerror = () => resolve([]);
+  });
+}
+
+/**
  * Network-first strategy
- * Try network, fall back to cache, respond
  */
 async function networkFirst(request, cacheName) {
   try {
@@ -97,7 +157,6 @@ async function networkFirst(request, cacheName) {
     const cached = await caches.match(request);
     if (cached) return cached;
     
-    // If it's a navigation request, return the cached index.html
     if (request.mode === 'navigate') {
       return caches.match('/index.html');
     }
@@ -111,7 +170,6 @@ async function networkFirst(request, cacheName) {
 
 /**
  * Cache-first strategy
- * Try cache, fall back to network
  */
 async function cacheFirst(request, cacheName) {
   const cached = await caches.match(request);
@@ -125,7 +183,6 @@ async function cacheFirst(request, cacheName) {
     }
     return response;
   } catch (error) {
-    // Return a placeholder for images
     if (request.destination === 'image') {
       return new Response(
         '<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200"><rect fill="#f0f0f0" width="200" height="200"/><text fill="#999" font-family="sans-serif" font-size="14" x="50%" y="50%" text-anchor="middle" dy=".3em">📷</text></svg>',

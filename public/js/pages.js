@@ -22,24 +22,29 @@ const Pages = {
       const totalProducts = productsData?.pagination?.total || 0;
       const totalStores = storesData?.pagination?.total || 0;
 
+      // Get loyalty coins
+      const coins = Loyalty.getCoins();
+
       UI.render(`
-        <!-- Hero Banner -->
-        <div class="hero-banner">
-          <h2 class="hero-title">🏪 دليل المستودعات والأسواق المنزلية</h2>
-          <p class="hero-subtitle">كل ما يحتاجه منزلك في مكان واحد - مدينة الرقة</p>
-          <div class="hero-stats">
-            <div class="hero-stat">
-              <span class="stat-num">${totalStores}+</span>
-              <span class="stat-label">متجر موثق</span>
+        <!-- Bento Hero Grid -->
+        <div class="bento-grid" style="padding: 12px;">
+          <div class="bento-item span-2 gradient-primary" onclick="Router.navigate('/')">
+            <h2 style="font-size:1.3rem;margin-bottom:6px">🏪 دليل الرقة</h2>
+            <p style="font-size:0.82rem;opacity:0.9">كل ما يحتاجه منزلك في مكان واحد</p>
+            <div style="display:flex;gap:16px;margin-top:10px;">
+              <span><strong>${totalStores}+</strong> متجر</span>
+              <span><strong>${totalProducts}+</strong> منتج</span>
+              <span><strong>${categories.length}</strong> تصنيف</span>
             </div>
-            <div class="hero-stat">
-              <span class="stat-num">${totalProducts}+</span>
-              <span class="stat-label">منتج</span>
-            </div>
-            <div class="hero-stat">
-              <span class="stat-num">${categories.length}</span>
-              <span class="stat-label">تصنيف</span>
-            </div>
+          </div>
+          <div class="bento-item gradient-gold" onclick="Router.navigate('/loyalty')" style="cursor:pointer">
+            <div style="font-size:2rem">🪙</div>
+            <div style="font-size:1.4rem;font-weight:700">${coins}</div>
+            <div style="font-size:0.75rem;opacity:0.8">عملاتي</div>
+          </div>
+          <div class="bento-item gradient-sunset" onclick="Router.navigate('/offers')" style="cursor:pointer">
+            <div style="font-size:2rem">🏷️</div>
+            <div style="font-size:0.85rem;font-weight:600">العروض</div>
           </div>
         </div>
 
@@ -70,27 +75,17 @@ const Pages = {
           ${stores.map(s => UI.storeCard(s)).join('')}
         </div>
 
-        <!-- Bridal Package CTA -->
-        <div style="padding: 16px 12px;">
-          <div class="card" style="padding: 20px; text-align: center; background: linear-gradient(135deg, #ffecd2, #fcb69f); border: none;">
-            <div style="font-size: 2rem; margin-bottom: 8px;">💍👰</div>
-            <h3 style="margin-bottom: 6px; color: #c0392b;">تجهيز العرسان</h3>
-            <p style="font-size: 0.85rem; color: #666; margin-bottom: 12px;">
-              اكتشفي باكجات التجهيز الكاملة - أثاث، أجهزة، أدوات منزلية
-            </p>
-            <a href="#/products?search=عرسان" class="btn btn-secondary btn-sm">اكتشفي العروض</a>
+        <!-- CTAs Bento -->
+        <div class="bento-grid" style="padding: 12px;">
+          <div class="bento-item gradient-rose" onclick="Router.navigate('/products?search=عرسان')" style="cursor:pointer">
+            <div style="font-size:2rem">💍👰</div>
+            <h3 style="font-size:0.9rem;margin:6px 0 4px">تجهيز العرسان</h3>
+            <p style="font-size:0.75rem;opacity:0.85">باكجات كاملة</p>
           </div>
-        </div>
-
-        <!-- Solar CTA -->
-        <div style="padding: 0 12px 16px;">
-          <div class="card" style="padding: 20px; text-align: center; background: linear-gradient(135deg, #d4efdf, #a9dfbf); border: none;">
-            <div style="font-size: 2rem; margin-bottom: 8px;">☀️🔋</div>
-            <h3 style="margin-bottom: 6px; color: #1e8449;">حلول الطاقة الشمسية</h3>
-            <p style="font-size: 0.85rem; color: #666; margin-bottom: 12px;">
-              ودّع انقطاع الكهرباء - أنظمة سولار متكاملة مع التركيب
-            </p>
-            <a href="#/category/9" class="btn btn-success btn-sm">تصفح الأنظمة</a>
+          <div class="bento-item gradient-green" onclick="Router.navigate('/category/9')" style="cursor:pointer">
+            <div style="font-size:2rem">☀️🔋</div>
+            <h3 style="font-size:0.9rem;margin:6px 0 4px">طاقة شمسية</h3>
+            <p style="font-size:0.75rem;opacity:0.85">أنظمة سولار متكاملة</p>
           </div>
         </div>
       `);
@@ -799,6 +794,153 @@ const Pages = {
     } catch (e) {
       UI.showError();
     }
+  },
+
+  // ===================== LOYALTY PAGE =====================
+  async loyalty() {
+    UI.showLoading();
+    try {
+      const deviceId = App.getDeviceId();
+      const account = await Loyalty.getAccount();
+      let leaderboard = [];
+      try {
+        leaderboard = await API.fetch('/loyalty/leaderboard/top');
+      } catch (e) { /* offline */ }
+
+      const levelEmojis = { 'زائر': '🌱', 'متسوق': '🛒', 'عميل مميز': '⭐', 'عميل ذهبي': '👑', 'سفير الرقة': '🏆' };
+      const levelName = account.level?.name || 'زائر';
+      const levelIcon = account.level?.icon || '🌱';
+      const nextLevelAt = account.next_level ? account.next_level.min : null;
+      const progress = nextLevelAt ? Math.min(100, Math.round((account.total_earned / nextLevelAt) * 100)) : 100;
+
+      UI.render(`
+        <div class="page-title-bar">
+          <a href="#/" class="back-btn">→</a>
+          <h2 class="page-title">🪙 عملاتي ومكافآتي</h2>
+        </div>
+
+        <!-- Loyalty Hero -->
+        <div class="loyalty-hero">
+          <div class="loyalty-coins-display">
+            <span class="coins-amount">${account.coins}</span>
+            <span class="coins-label">عملة سوقية</span>
+          </div>
+          <div class="loyalty-level">
+            <span>${levelIcon} ${levelName}</span>
+          </div>
+          ${nextLevelAt ? `
+            <div class="loyalty-progress">
+              <div class="progress-bar">
+                <div class="progress-fill" style="width: ${progress}%"></div>
+              </div>
+              <span class="progress-text">${account.total_earned}/${nextLevelAt} للمستوى التالي</span>
+            </div>
+          ` : '<div style="font-size:0.82rem;color:var(--text-light);margin-top:8px">🏆 أعلى مستوى!</div>'}
+        </div>
+
+        <!-- Actions -->
+        <div class="loyalty-actions">
+          <button class="loyalty-action-card" onclick="Pages._dailyCheckin()">
+            <div class="action-icon">📅</div>
+            <div class="action-title">تسجيل يومي</div>
+            <div class="action-desc">+1 عملة يومياً</div>
+            <div class="action-streak">🔥 سلسلة: ${account.streak || 0} يوم</div>
+          </button>
+          <button class="loyalty-action-card" onclick="Pages._shareForCoins()">
+            <div class="action-icon">📤</div>
+            <div class="action-title">شارك منتج</div>
+            <div class="action-desc">+2 عملة لكل مشاركة</div>
+          </button>
+          <button class="loyalty-action-card" onclick="Pages._scanForCoins()">
+            <div class="action-icon">📱</div>
+            <div class="action-title">مسح QR</div>
+            <div class="action-desc">+1 عملة لكل مسح</div>
+          </button>
+        </div>
+
+        <!-- Leaderboard -->
+        ${leaderboard.length > 0 ? `
+          <div class="section-header">
+            <h3 class="section-title">🏆 المتصدرون</h3>
+          </div>
+          <div class="leaderboard-list">
+            ${leaderboard.map((u, i) => `
+              <div class="leaderboard-item ${u.device_id === deviceId ? 'is-me' : ''}">
+                <span class="lb-rank">${i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : (i+1)}</span>
+                <span class="lb-name">${u.device_id === deviceId ? 'أنت' : 'متسوق ' + (i+1)}</span>
+                <span class="lb-coins">${u.total_earned || u.total_coins || 0} 🪙</span>
+              </div>
+            `).join('')}
+          </div>
+        ` : ''}
+
+        <!-- How it works -->
+        <div style="padding: 16px;">
+          <div class="card" style="padding: 16px;">
+            <h3 style="margin-bottom:10px;font-size:0.95rem">📖 كيف يعمل نظام العملات؟</h3>
+            <div style="font-size:0.82rem;color:var(--text-light);line-height:1.8">
+              <p>📅 <strong>تسجيل يومي:</strong> +1 عملة + مكافأة كل 7 أيام متتالية</p>
+              <p>📤 <strong>مشاركة واتساب:</strong> +2 عملة (حتى 5 مشاركات/يوم)</p>
+              <p>📱 <strong>مسح QR:</strong> +1 عملة (حتى 10 مسح/يوم)</p>
+              <p>💰 <strong>إتمام صفقة:</strong> +5 عملات عند تأكيد الاستلام</p>
+            </div>
+          </div>
+        </div>
+      `);
+    } catch (e) {
+      UI.showError('تعذر تحميل صفحة المكافآت');
+    }
+  },
+
+  async _dailyCheckin() {
+    try {
+      const result = await Loyalty.dailyCheckin();
+      if (!result.success) {
+        UI.toast('✅ تم التسجيل اليوم مسبقاً');
+      } else {
+        UI.toast(`🪙 +${result.coins_earned} عملة! سلسلة: ${result.streak} يوم 🔥`);
+        // Refresh page
+        Pages.loyalty();
+      }
+    } catch (e) {
+      UI.toast('حدث خطأ في التسجيل');
+    }
+  },
+
+  _shareForCoins() {
+    UI.toast('📤 شارك أي منتج عبر واتساب لكسب عملات!');
+    Router.navigate('/products?featured=1');
+  },
+
+  _scanForCoins() {
+    UI.toast('📱 امسح QR Code في أي متجر لكسب عملات!');
+  },
+
+  // ===================== VISUAL SEARCH RESULTS =====================
+  visualSearchResults(results) {
+    UI.render(`
+      <div class="page-title-bar">
+        <a href="#/" class="back-btn">→</a>
+        <h2 class="page-title">📷 نتائج البحث المرئي</h2>
+      </div>
+
+      <div class="products-grid">
+        ${results.map(p => `
+          <div style="position:relative">
+            <div class="visual-match-badge">${Math.round(p.visual_match * 100)}% تطابق</div>
+            ${UI.productCard(p)}
+          </div>
+        `).join('')}
+      </div>
+
+      ${results.length === 0 ? `
+        <div class="empty-state">
+          <div class="empty-icon">📷</div>
+          <h3>لم يتم العثور على نتائج</h3>
+          <p>جرّب صورة أوضح أو من زاوية مختلفة</p>
+        </div>
+      ` : ''}
+    `);
   },
 
   // ===================== ABOUT PAGE =====================

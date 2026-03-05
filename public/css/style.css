@@ -1572,3 +1572,719 @@ input, select {
     padding-bottom: 0;
   }
 }
+
+/* ===================================
+   DARK MODE (Task 2)
+   =================================== */
+[data-theme="dark"],
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --primary: #3498db;
+    --primary-light: #5dade2;
+    --primary-dark: #1a5276;
+    --secondary: #f39c12;
+    --secondary-light: #f5b041;
+    --accent: #2ecc71;
+    --accent-light: #58d68d;
+    --danger: #e74c3c;
+
+    --bg: #0f0f1a;
+    --bg-card: #1a1a2e;
+    --bg-dark: #0a0a14;
+
+    --text: #e0e0e0;
+    --text-light: #a0a0b0;
+    --text-muted: #666680;
+    --text-white: #ffffff;
+
+    --border: #2a2a40;
+    --shadow: 0 2px 8px rgba(0,0,0,0.3);
+    --shadow-lg: 0 4px 16px rgba(0,0,0,0.4);
+  }
+}
+[data-theme="dark"] {
+  --primary: #3498db;
+  --primary-light: #5dade2;
+  --primary-dark: #1a5276;
+  --secondary: #f39c12;
+  --secondary-light: #f5b041;
+  --accent: #2ecc71;
+  --accent-light: #58d68d;
+  --danger: #e74c3c;
+
+  --bg: #0f0f1a;
+  --bg-card: #1a1a2e;
+  --bg-dark: #0a0a14;
+
+  --text: #e0e0e0;
+  --text-light: #a0a0b0;
+  --text-muted: #666680;
+  --text-white: #ffffff;
+
+  --border: #2a2a40;
+  --shadow: 0 2px 8px rgba(0,0,0,0.3);
+  --shadow-lg: 0 4px 16px rgba(0,0,0,0.4);
+}
+
+[data-theme="dark"] .app-header {
+  background: linear-gradient(135deg, #1a1a2e, #0f0f1a);
+}
+
+[data-theme="dark"] .bottom-nav {
+  background: #1a1a2e;
+  border-top-color: #2a2a40;
+}
+
+[data-theme="dark"] .product-img .placeholder-img {
+  background: linear-gradient(135deg, #1a1a2e, #2a2a40);
+}
+
+[data-theme="dark"] .product-gallery .placeholder-img {
+  background: linear-gradient(135deg, #1a1a2e, #2a2a40);
+}
+
+[data-theme="dark"] .sort-select {
+  background: #1a1a2e;
+  color: var(--text);
+  border-color: #2a2a40;
+}
+
+[data-theme="dark"] .offline-banner {
+  background: #332b00;
+  color: #f5b041;
+}
+
+[data-theme="dark"] .search-input-wrap {
+  background: #1a1a2e;
+}
+
+[data-theme="dark"] .search-input-wrap input {
+  color: var(--text);
+}
+
+[data-theme="dark"] .product-actions {
+  background: #1a1a2e;
+}
+
+[data-theme="dark"] .side-menu {
+  background: #1a1a2e;
+}
+
+[data-theme="dark"] .menu-list a {
+  color: var(--text);
+}
+
+[data-theme="dark"] .menu-list a:hover,
+[data-theme="dark"] .menu-list a.active {
+  background: #0f0f1a;
+  color: var(--primary-light);
+}
+
+/* Dark mode toggle button */
+.theme-toggle {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  color: white;
+  transition: background 0.2s;
+  font-size: 1.1rem;
+  cursor: pointer;
+}
+
+.theme-toggle:hover {
+  background: rgba(255,255,255,0.15);
+}
+
+/* ===================================
+   BENTO GRID LAYOUT (Task 2)
+   =================================== */
+.bento-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-auto-rows: minmax(100px, auto);
+  gap: 10px;
+  padding: 8px 12px;
+}
+
+.bento-item {
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.25s;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 16px 12px;
+  text-decoration: none;
+  color: var(--text);
+}
+
+.bento-item:hover {
+  transform: scale(1.02);
+  box-shadow: var(--shadow-lg);
+}
+
+.bento-item:active {
+  transform: scale(0.98);
+}
+
+.bento-item.span-2 {
+  grid-column: span 2;
+}
+
+.bento-item.tall {
+  grid-row: span 2;
+}
+
+.bento-item .bento-icon {
+  font-size: 2.2rem;
+  margin-bottom: 8px;
+}
+
+.bento-item .bento-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.bento-item .bento-desc {
+  font-size: 0.72rem;
+  color: var(--text-light);
+  line-height: 1.4;
+}
+
+.bento-item .bento-badge {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  background: var(--danger);
+  color: white;
+  padding: 2px 8px;
+  border-radius: 20px;
+  font-size: 0.65rem;
+  font-weight: 700;
+}
+
+.bento-item.gradient-warm {
+  background: linear-gradient(135deg, #ffecd2, #fcb69f);
+}
+
+.bento-item.gradient-cool {
+  background: linear-gradient(135deg, #a1c4fd, #c2e9fb);
+}
+
+.bento-item.gradient-green {
+  background: linear-gradient(135deg, #d4efdf, #a9dfbf);
+}
+
+.bento-item.gradient-purple {
+  background: linear-gradient(135deg, #e2d5f1, #c3a6e0);
+}
+
+.bento-item.gradient-gold {
+  background: linear-gradient(135deg, #f9e79f, #f0b27a);
+}
+
+[data-theme="dark"] .bento-item.gradient-warm {
+  background: linear-gradient(135deg, #44322a, #3b2820);
+}
+[data-theme="dark"] .bento-item.gradient-cool {
+  background: linear-gradient(135deg, #1a2a3e, #1e3040);
+}
+[data-theme="dark"] .bento-item.gradient-green {
+  background: linear-gradient(135deg, #1a3025, #1e3a2a);
+}
+[data-theme="dark"] .bento-item.gradient-purple {
+  background: linear-gradient(135deg, #2a2040, #332850);
+}
+[data-theme="dark"] .bento-item.gradient-gold {
+  background: linear-gradient(135deg, #3a3020, #443828);
+}
+
+@media (min-width: 480px) {
+  .bento-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (min-width: 768px) {
+  .bento-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* ===================================
+   MICRO-INTERACTIONS (Task 2)
+   =================================== */
+/* Haptic-feel button press */
+.btn, .product-card, .store-card, .category-chip, .category-card, .bento-item {
+  transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s, background 0.2s;
+}
+
+.product-card:active,
+.store-card:active,
+.category-chip:active,
+.category-card:active,
+.btn:active {
+  transform: scale(0.96) !important;
+}
+
+/* Wishlist heart animation */
+@keyframes heartPop {
+  0% { transform: scale(1); }
+  30% { transform: scale(1.4); }
+  60% { transform: scale(0.9); }
+  100% { transform: scale(1); }
+}
+
+.product-wishlist-btn.animating {
+  animation: heartPop 0.4s ease;
+}
+
+/* Toast slide animation */
+@keyframes toastSlide {
+  0% { transform: translateX(-50%) translateY(20px); opacity: 0; }
+  100% { transform: translateX(-50%) translateY(0); opacity: 1; }
+}
+
+.toast.visible {
+  animation: toastSlide 0.3s ease;
+}
+
+/* Ripple effect for buttons */
+.ripple {
+  position: relative;
+  overflow: hidden;
+}
+
+.ripple::after {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.3);
+  width: 100px;
+  height: 100px;
+  margin-top: -50px;
+  margin-right: -50px;
+  top: 50%;
+  right: 50%;
+  transform: scale(0);
+  opacity: 1;
+  transition: transform 0.5s, opacity 0.5s;
+}
+
+.ripple:active::after {
+  transform: scale(4);
+  opacity: 0;
+  transition: 0s;
+}
+
+/* Smooth page transitions */
+.app-content {
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Loyalty coin animation */
+@keyframes coinBounce {
+  0% { transform: translateY(0); }
+  40% { transform: translateY(-12px); }
+  60% { transform: translateY(-6px); }
+  100% { transform: translateY(0); }
+}
+
+.coin-bounce {
+  display: inline-block;
+  animation: coinBounce 0.6s ease;
+}
+
+/* ===================================
+   LOYALTY PAGE (Task 4)
+   =================================== */
+.loyalty-header {
+  background: linear-gradient(135deg, #f39c12, #e67e22);
+  color: white;
+  padding: 24px 20px;
+  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+  text-align: center;
+}
+
+[data-theme="dark"] .loyalty-header {
+  background: linear-gradient(135deg, #6e3907, #5a2d06);
+}
+
+.loyalty-coins {
+  font-size: 2.5rem;
+  font-weight: 800;
+  margin: 8px 0;
+}
+
+.loyalty-level {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255,255,255,0.2);
+  padding: 4px 14px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.loyalty-progress {
+  margin: 12px auto 0;
+  max-width: 240px;
+  height: 6px;
+  background: rgba(255,255,255,0.2);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.loyalty-progress-fill {
+  height: 100%;
+  background: white;
+  border-radius: 3px;
+  transition: width 0.5s ease;
+}
+
+.loyalty-actions {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  padding: 16px;
+}
+
+.loyalty-action-card {
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 16px 8px;
+  text-align: center;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.loyalty-action-card:active {
+  transform: scale(0.95);
+}
+
+.loyalty-action-card .action-icon {
+  font-size: 1.8rem;
+  margin-bottom: 6px;
+}
+
+.loyalty-action-card .action-title {
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.loyalty-action-card .action-reward {
+  font-size: 0.68rem;
+  color: var(--secondary);
+  font-weight: 700;
+  margin-top: 4px;
+}
+
+.loyalty-tx-list {
+  padding: 0 16px 16px;
+}
+
+.loyalty-tx-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 12px;
+  background: var(--bg-card);
+  border-radius: var(--radius-sm);
+  margin-bottom: 6px;
+  box-shadow: var(--shadow);
+}
+
+.loyalty-tx-item .tx-info {
+  font-size: 0.82rem;
+}
+
+.loyalty-tx-item .tx-coins {
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: var(--accent);
+}
+
+.loyalty-tx-item .tx-coins.negative {
+  color: var(--danger);
+}
+
+/* Streak display */
+.streak-display {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  margin-top: 6px;
+  opacity: 0.9;
+}
+
+/* ===================================
+   ESCROW / TRANSACTION (Task 3)
+   =================================== */
+.escrow-status {
+  text-align: center;
+  padding: 20px;
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  margin: 12px;
+  box-shadow: var(--shadow);
+}
+
+.escrow-status .status-icon {
+  font-size: 3rem;
+  margin-bottom: 8px;
+}
+
+.escrow-status .status-text {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.escrow-status .status-amount {
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: var(--primary);
+}
+
+/* ===================================
+   VISUAL SEARCH (Task 5)
+   =================================== */
+.camera-btn {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  color: white;
+  transition: background 0.2s;
+  cursor: pointer;
+}
+
+.camera-btn:hover {
+  background: rgba(255,255,255,0.15);
+}
+
+.visual-search-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.8);
+  z-index: 500;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.visual-search-modal video {
+  max-width: 100%;
+  max-height: 60vh;
+  border-radius: var(--radius);
+}
+
+.visual-search-modal .capture-btn {
+  margin-top: 16px;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: white;
+  border: 4px solid var(--primary);
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.visual-search-modal .capture-btn:active {
+  transform: scale(0.9);
+}
+
+.visual-search-modal .close-vs {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  color: white;
+  font-size: 1.5rem;
+  cursor: pointer;
+  background: rgba(0,0,0,0.5);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ===================================
+   ADDITIONAL BENTO GRADIENTS
+   =================================== */
+.bento-item.gradient-primary {
+  background: linear-gradient(135deg, var(--primary), #1a5276);
+  color: white;
+}
+.bento-item.gradient-sunset {
+  background: linear-gradient(135deg, #f39c12, #e74c3c);
+  color: white;
+}
+.bento-item.gradient-rose {
+  background: linear-gradient(135deg, #ffecd2, #fcb69f);
+  color: #5a3621;
+}
+
+[data-theme="dark"] .bento-item.gradient-primary {
+  background: linear-gradient(135deg, #1a3a50, #0e2535);
+}
+[data-theme="dark"] .bento-item.gradient-sunset {
+  background: linear-gradient(135deg, #5a3a10, #4a1a18);
+}
+[data-theme="dark"] .bento-item.gradient-rose {
+  background: linear-gradient(135deg, #3a2a1a, #3b2218);
+  color: #e8c5a5;
+}
+
+/* ===================================
+   LOYALTY PAGE EXTENDED
+   =================================== */
+.loyalty-hero {
+  background: linear-gradient(135deg, var(--accent), #d4940a);
+  color: white;
+  padding: 24px 16px;
+  margin: 0 12px 12px;
+  border-radius: var(--radius-lg);
+  text-align: center;
+}
+[data-theme="dark"] .loyalty-hero {
+  background: linear-gradient(135deg, #5a4208, #3d2d06);
+}
+
+.loyalty-coins-display {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.coins-amount {
+  font-size: 2.5rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.coins-label {
+  font-size: 0.82rem;
+  opacity: 0.85;
+  margin-top: 4px;
+}
+
+.loyalty-progress .progress-bar {
+  height: 6px;
+  background: rgba(255,255,255,0.2);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-top: 10px;
+}
+
+.loyalty-progress .progress-fill {
+  height: 100%;
+  background: white;
+  border-radius: 3px;
+  transition: width 0.5s ease;
+}
+
+.loyalty-progress .progress-text {
+  font-size: 0.72rem;
+  opacity: 0.8;
+  margin-top: 4px;
+  display: block;
+}
+
+.loyalty-action-card .action-desc {
+  font-size: 0.68rem;
+  color: var(--text-light);
+  margin-top: 2px;
+}
+
+.loyalty-action-card .action-streak {
+  font-size: 0.65rem;
+  color: var(--secondary);
+  font-weight: 700;
+  margin-top: 4px;
+}
+
+/* ===================================
+   LEADERBOARD
+   =================================== */
+.leaderboard-list {
+  padding: 0 16px 16px;
+}
+
+.leaderboard-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  background: var(--bg-card);
+  border-radius: var(--radius-sm);
+  margin-bottom: 6px;
+  box-shadow: var(--shadow);
+}
+
+.leaderboard-item.is-me {
+  border: 2px solid var(--accent);
+  background: rgba(243, 156, 18, 0.05);
+}
+
+.lb-rank {
+  font-size: 1.1rem;
+  min-width: 28px;
+  text-align: center;
+}
+
+.lb-level {
+  font-size: 1rem;
+}
+
+.lb-name {
+  flex: 1;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.lb-coins {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+/* ===================================
+   VISUAL MATCH BADGE
+   =================================== */
+.visual-match-badge {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  background: rgba(39, 174, 96, 0.9);
+  color: white;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  z-index: 10;
+}

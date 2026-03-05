@@ -115,5 +115,31 @@ const API = {
   // === Stats ===
   async getStats() {
     return this.fetch('/stats/overview');
+  },
+
+  // === Escrow (Task 3) ===
+  async createTransaction(productId, amount) {
+    const deviceId = App.getDeviceId();
+    return this.fetch('/qr/transaction', {
+      method: 'POST',
+      body: JSON.stringify({ product_id: productId, buyer_device_id: deviceId, amount })
+    });
+  },
+
+  async verifyTransaction(txCode) {
+    return this.fetch(`/qr/verify/${txCode}`);
+  },
+
+  async releasePayment(txCode) {
+    const deviceId = App.getDeviceId();
+    return this.fetch(`/qr/release/${txCode}`, {
+      method: 'POST',
+      body: JSON.stringify({ buyer_device_id: deviceId })
+    });
+  },
+
+  // === Visual Search (Task 5) ===
+  async visualSearch(query) {
+    return this.fetch(`/search/visual?q=${encodeURIComponent(query)}`);
   }
 };
